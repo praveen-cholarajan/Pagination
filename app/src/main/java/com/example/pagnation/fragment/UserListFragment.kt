@@ -27,7 +27,7 @@ class UserListFragment : Fragment(), UserListListener {
     lateinit var adapter: UserListAdapter
     var listener: MainListener? = null
 
-    var bundle: Bundle? = null
+    private var bundle: Bundle? = null
 
     companion object {
         @JvmStatic
@@ -42,6 +42,7 @@ class UserListFragment : Fragment(), UserListListener {
 
     private lateinit var binding: FragmentUserBinding
     private val viewModel by viewModels<UserListViewModel>()
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -71,8 +72,8 @@ class UserListFragment : Fragment(), UserListListener {
                 }
             }
         }
-
     }
+
 
     private fun initRecyclerView() {
         binding.rvUserList.apply {
@@ -83,11 +84,10 @@ class UserListFragment : Fragment(), UserListListener {
     }
 
     override fun userData(data: PaginationResponse?, comments: String?) {
-        Timber.d("Adapter position userData Clicked :$comments : data:$data")
+
         listener?.userDetailFetch(data!!)
         (activity as MainActivity).loadRequiredFragment(
             UserDetailFragment.newInstance(listener!!),
-            1
         )
     }
 
@@ -96,21 +96,25 @@ class UserListFragment : Fragment(), UserListListener {
         getUserLists()
     }
 
-    override fun onPause() {
-        super.onPause()
-        bundle?.let {
-            onSaveInstanceState(it)
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        val args = Bundle()
+        args.putSerializable("comment", adapter.getCommentList())
+        (activity as MainActivity).saveStateInstance(args)
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+
+        (activity as MainActivity).getStateInstance()?.let {
+            val args: Bundle = it
+            args.getSerializable("comment")?.let { com ->
+                adapter.saveCommentList(com as HashMap<Int, String?>)
+            }
         }
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        bundle = outState
-        super.onSaveInstanceState(outState)
 
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
 
 }

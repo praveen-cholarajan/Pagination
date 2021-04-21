@@ -20,15 +20,32 @@ class UserListAdapter @Inject constructor() : PagingDataAdapter<PaginationRespon
     var listener: UserListListener? = null
     var commentsInfo: String? = null
 
+    var retrieveDataList: HashMap<Int, String?> = hashMapOf()
+
     fun userListener(listener: UserListListener) {
         this.listener = listener
     }
 
+    fun getCommentList(): HashMap<Int, String?> {
+        return retrieveDataList
+    }
+
+    fun saveCommentList(comments: HashMap<Int, String?>) {
+        retrieveDataList = comments
+    }
+
     override fun onBindViewHolder(holder: UserViewHolder, position: Int) {
+        Timber.d("onBindViewHolder : ${retrieveDataList.size}")
+
         getItem(position)?.let {
             holder.bindData(it)
+            for ((key, value) in retrieveDataList.entries) {
+                Timber.d("onBindViewHolder : $key $value")
+                if (key == it.id) {
+                    holder.binding.commands.setText(value.toString())
+                }
+            }
         }
-
     }
 
     override fun onCreateViewHolder(
@@ -52,27 +69,32 @@ class UserListAdapter @Inject constructor() : PagingDataAdapter<PaginationRespon
                 listener = this@UserViewHolder
                 Picasso.get().load(paginationResponse.owner?.ImageUrl).into(ivAvatar)
                 initTextWatcher()
-                Timber.d("Adapter position $absoluteAdapterPosition:$commentsInfo")
+
             }
         }
 
 
         override fun onItemClicked() {
-            Timber.d("Adapter position click${getItem(absoluteAdapterPosition)}")
+
             val data = getItem(absoluteAdapterPosition)
             listener?.userData(data, commentsInfo)
         }
-        private fun initTextWatcher(){
-            binding.commands.addTextChangedListener(object :TextWatcher{
+
+        private fun initTextWatcher() {
+            binding.commands.addTextChangedListener(object : TextWatcher {
                 override fun beforeTextChanged(
                     s: CharSequence?,
                     start: Int,
                     count: Int,
                     after: Int
-                ) {}
+                ) {
+                }
+
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
                 override fun afterTextChanged(s: Editable?) {
                     commentsInfo = s.toString()
+                    retrieveDataList[getItem(absoluteAdapterPosition)?.id!!] = s.toString()
+                    Timber.d("Adapter UserViewHolder : $retrieveDataList")
                 }
             })
         }

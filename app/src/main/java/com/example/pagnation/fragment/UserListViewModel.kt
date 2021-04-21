@@ -35,7 +35,6 @@ class UserListViewModel @Inject constructor(private val repository: PaginationRe
     })
 
 
-
     private inline fun <T> launchPagingAsync(
         crossinline execute: suspend () -> Flow<T>,
         crossinline onSuccess: (Flow<T>) -> Unit

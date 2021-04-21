@@ -6,7 +6,6 @@ import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
 import com.example.pagnation.databinding.ActivityMainBinding
 import com.example.pagnation.fragment.ThreeFragment
 import com.example.pagnation.fragment.UserDetailFragment
@@ -14,7 +13,6 @@ import com.example.pagnation.fragment.UserListFragment
 import com.example.pagnation.response.PaginationResponse
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
-import timber.log.Timber
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(),
@@ -24,8 +22,7 @@ class MainActivity : AppCompatActivity(),
     private val viewModel by viewModels<MainViewModel>()
     private var userDetails: PaginationResponse? = null
 
-
-
+    private var fragmentArgs: Bundle? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,57 +33,29 @@ class MainActivity : AppCompatActivity(),
         biniding.bottomNav.selectedItemId = R.id.navOne
     }
 
-    fun loadRequiredFragment(fragment: Fragment?, type: Int): Boolean {
-
-        val backStateName: String? = fragment?.javaClass?.name
-        var requiredFragment: Fragment? = null
-        supportFragmentManager.fragments.let {
-            Timber.d("loadRequireFragment size : ${it.size}")
-            for (item in it) {
-                when (type) {
-                    0 -> {
-                        if (item.tag == "UserListFragment") {
-                            requiredFragment = item
-                            Timber.d("loadRequireFragment type :$type: $requiredFragment")
-                        }
-                        break
-                    }
-                }
-            }
-        }
-        Timber.d("loadRequireFragment : $requiredFragment")
+    fun loadRequiredFragment(fragment: Fragment?): Boolean {
 
         fragment?.let { frag ->
             supportFragmentManager
                 .beginTransaction()
                 .replace(
                     R.id.container,
-                    if (requiredFragment != null && requiredFragment is UserListFragment) requiredFragment!! else frag
+                    frag
                 )
-                .addToBackStack(if (requiredFragment != null && requiredFragment is UserListFragment) "UserListFragment" else "Fragment")
+                .addToBackStack(frag.tag)
                 .commit()
         }
         return false
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        var type = 0
         val fragment: Fragment? = when (item.itemId) {
-            R.id.navOne -> {
-                type = 0
-                UserListFragment.newInstance(this)
-            }
-            R.id.navTwo -> {
-                type = 1
-                UserDetailFragment.newInstance(this)
-            }
-            R.id.navThree -> {
-                type = 2
-                ThreeFragment.newInstance(this)
-            }
+            R.id.navOne -> UserListFragment.newInstance(this)
+            R.id.navTwo -> UserDetailFragment.newInstance(this)
+            R.id.navThree -> ThreeFragment.newInstance(this)
             else -> null
         }
-        return loadRequiredFragment(fragment, type)
+        return loadRequiredFragment(fragment)
     }
 
     override fun userDetailFetch(user: PaginationResponse) {
@@ -100,8 +69,17 @@ class MainActivity : AppCompatActivity(),
     override fun onBackPressed() {
         when (supportFragmentManager.findFragmentById(R.id.container)) {
             is UserListFragment -> moveTaskToBack(true)
-            is UserDetailFragment -> loadRequiredFragment(UserListFragment.newInstance(this), 0)
-            is ThreeFragment -> loadRequiredFragment(UserListFragment.newInstance(this), 0)
+            is UserDetailFragment -> loadRequiredFragment(UserListFragment.newInstance(this))
+            is ThreeFragment -> loadRequiredFragment(UserListFragment.newInstance(this))
         }
     }
+
+    fun saveStateInstance(arg: Bundle){
+        fragmentArgs = arg
+    }
+
+    fun getStateInstance() :Bundle?{
+        return fragmentArgs
+    }
+
 }

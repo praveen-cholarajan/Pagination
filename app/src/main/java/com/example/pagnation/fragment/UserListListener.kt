@@ -6,4 +6,5 @@ interface UserListListener {
 
     fun userData(data:PaginationResponse?,comments:String?)
 
+
 }
