@@ -6,6 +6,7 @@ import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import com.example.pagnation.databinding.ActivityMainBinding
 import com.example.pagnation.fragment.ThreeFragment
 import com.example.pagnation.fragment.UserDetailFragment
@@ -24,6 +25,8 @@ class MainActivity : AppCompatActivity(),
     private var userDetails: PaginationResponse? = null
 
 
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         biniding = ActivityMainBinding.inflate(layoutInflater)
@@ -38,10 +41,11 @@ class MainActivity : AppCompatActivity(),
         val backStateName: String? = fragment?.javaClass?.name
         var requiredFragment: Fragment? = null
         supportFragmentManager.fragments.let {
+            Timber.d("loadRequireFragment size : ${it.size}")
             for (item in it) {
                 when (type) {
                     0 -> {
-                        if (item is UserListFragment) {
+                        if (item.tag == "UserListFragment") {
                             requiredFragment = item
                             Timber.d("loadRequireFragment type :$type: $requiredFragment")
                         }
@@ -51,6 +55,7 @@ class MainActivity : AppCompatActivity(),
             }
         }
         Timber.d("loadRequireFragment : $requiredFragment")
+
         fragment?.let { frag ->
             supportFragmentManager
                 .beginTransaction()
@@ -58,8 +63,7 @@ class MainActivity : AppCompatActivity(),
                     R.id.container,
                     if (requiredFragment != null && requiredFragment is UserListFragment) requiredFragment!! else frag
                 )
-
-                .addToBackStack(null)
+                .addToBackStack(if (requiredFragment != null && requiredFragment is UserListFragment) "UserListFragment" else "Fragment")
                 .commit()
         }
         return false

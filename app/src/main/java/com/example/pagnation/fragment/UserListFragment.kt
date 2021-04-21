@@ -27,6 +27,8 @@ class UserListFragment : Fragment(), UserListListener {
     lateinit var adapter: UserListAdapter
     var listener: MainListener? = null
 
+    var bundle: Bundle? = null
+
     companion object {
         @JvmStatic
         fun newInstance(listener: MainListener): UserListFragment {
@@ -49,6 +51,7 @@ class UserListFragment : Fragment(), UserListListener {
         binding = FragmentUserBinding.inflate(inflater, container, false)
         binding.viewModel = viewModel
         binding.listener = this
+        bundle = savedInstanceState
         initRecyclerView()
         viewModel.apply {
             progressBarVisibility.set(View.VISIBLE)
@@ -91,6 +94,23 @@ class UserListFragment : Fragment(), UserListListener {
     override fun onResume() {
         super.onResume()
         getUserLists()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        bundle?.let {
+            onSaveInstanceState(it)
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        bundle = outState
+        super.onSaveInstanceState(outState)
+
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
     }
 
 }
