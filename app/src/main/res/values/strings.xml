@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Pagnation</string>
+    <string name="pagination">Pagination</string>
+    <string name="followers">Followers</string>
+    <string name="following">Following</string>
+    <string name="enter_your_comments">enter your comments</string>
+    <string name="fragment">Fragment</string>
+</resources>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:id="@+id/navOne"
+        android:title="User"
+        android:icon="@drawable/icon_user"/>
+
+    <item android:id="@+id/navTwo"
+        android:title="Detail"
+        android:icon="@drawable/icon_user"/>
+
+    <item android:id="@+id/navThree"
+        android:title="Three"
+        android:icon="@drawable/icon_user"/>
+
+
+</menu>
