@@ -1,6 +1,6 @@
 package com.example.pagnation
 
-import android.R.attr
+
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.activity.viewModels
@@ -15,15 +15,14 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 
-
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemSelectedListener,
-    MainListener {
+class MainActivity : AppCompatActivity(),
+    BottomNavigationView.OnNavigationItemSelectedListener, MainListener {
 
     private lateinit var biniding: ActivityMainBinding
     private val viewModel by viewModels<MainViewModel>()
-
     private var userDetails: PaginationResponse? = null
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,11 +33,10 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         biniding.bottomNav.selectedItemId = R.id.navOne
     }
 
-
     fun loadRequiredFragment(fragment: Fragment?, type: Int): Boolean {
+
         val backStateName: String? = fragment?.javaClass?.name
         var requiredFragment: Fragment? = null
-
         supportFragmentManager.fragments.let {
             for (item in it) {
                 when (type) {
@@ -53,7 +51,6 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
             }
         }
         Timber.d("loadRequireFragment : $requiredFragment")
-
         fragment?.let { frag ->
             supportFragmentManager
                 .beginTransaction()
@@ -61,7 +58,8 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
                     R.id.container,
                     if (requiredFragment != null && requiredFragment is UserListFragment) requiredFragment!! else frag
                 )
-                .addToBackStack(backStateName)
+
+                .addToBackStack(null)
                 .commit()
         }
         return false
@@ -96,7 +94,6 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
     }
 
     override fun onBackPressed() {
-
         when (supportFragmentManager.findFragmentById(R.id.container)) {
             is UserListFragment -> moveTaskToBack(true)
             is UserDetailFragment -> loadRequiredFragment(UserListFragment.newInstance(this), 0)

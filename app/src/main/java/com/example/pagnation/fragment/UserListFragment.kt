@@ -25,7 +25,7 @@ class UserListFragment : Fragment(), UserListListener {
 
     @Inject
     lateinit var adapter: UserListAdapter
-    var listener: MainListener?=null
+    var listener: MainListener? = null
 
     companion object {
         @JvmStatic
